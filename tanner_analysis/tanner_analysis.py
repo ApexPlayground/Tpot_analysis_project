@@ -1,20 +1,24 @@
 import os, gzip, json, pandas as pd, matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+import seaborn as sns
+import textwrap
 
-# Optional GeoIP (you can skip if not using)
+# GeoIP
 try:
     from geoip2.database import Reader
     GEOIP_ENABLED = True
 except ImportError:
     GEOIP_ENABLED = False
 
-# Paths
-LOG_DIR = "logs/"
-OUTPUT_DIR = "tanner_output"
-GEO_DB_PATH = "/home/divine/Documents/Network Security/analysis_project/tanner_analysis/GeoLite2-City.mmdb"
+# Path setup
+BASE_DIR = os.path.dirname(__file__)          
+LOG_DIR = os.path.join(BASE_DIR, "logs")      
+OUTPUT_DIR = os.path.join(BASE_DIR, "tanner_output")  
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+GEO_DB_PATH = "/home/divine/Documents/Network Security/analysis_project/tanner_analysis/GeoLite2-City.mmdb"
 
-# Global style (white background + blue accents)
+
+# Global style 
 plt.rcParams.update({
     "figure.facecolor": "white",
     "axes.facecolor": "white",
@@ -63,10 +67,6 @@ df["hour"] = df["timestamp"].dt.hour
 
 print(f"Loaded {len(df)} Tanner records")
 
-# -------------------- #
-# Visualization Section
-# -------------------- #
-
 # 1. Daily request trends
 daily = df.groupby("date").size()
 fig, ax = plt.subplots(figsize=(8, 4))
@@ -98,7 +98,26 @@ ax.set_xlabel("Request Count")
 ax.invert_yaxis()
 save_plot(ax, "top_paths.png")
 
-# 4. Detection types
+
+top_paths = df["path"].value_counts().head(10).index
+subset = df[df["path"].isin(top_paths)]
+method_path = subset.groupby(["path", "method"]).size().unstack(fill_value=0)
+
+fig, ax = plt.subplots(figsize=(10, 6))
+palette = sns.color_palette("Set2", n_colors=len(method_path.columns))
+method_path.plot(kind="bar", ax=ax, color=palette)
+
+ax.set_title("Top Endpoints by HTTP Method", fontsize=12)
+ax.set_xlabel("Endpoint (Path)")
+ax.set_ylabel("Request Count")
+plt.xticks(rotation=45, ha="right")
+plt.legend(title="HTTP Method")
+plt.tight_layout()
+plt.savefig(os.path.join(OUTPUT_DIR, "tanner_endpoints_by_method.png"), dpi=150)
+plt.close()
+
+
+# Detection types
 top_det = df["detection"].value_counts().head(10)
 if not top_det.empty:
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -119,7 +138,7 @@ plt.xticks(rotation=20, ha="right")
 save_plot(ax, "methods.png")
 
 
-# 6. HTTP status codes
+# HTTP status codes
 fig, ax = plt.subplots(figsize=(7, 4))
 status = df["status"].value_counts().sort_index()
 ax.bar(status.index.astype(str), status.values, color=COLOR)
@@ -129,10 +148,7 @@ ax.set_ylabel("Count")
 save_plot(ax, "status.png")
 
 # Top user agents
-import textwrap
-
 uas = df["user_agent"].value_counts().head(10)
-
 # wrap each long user-agent string to multiple lines
 wrapped_labels = [ "\n".join(textwrap.wrap(label, width=60)) for label in uas.index ]
 fig, ax = plt.subplots(figsize=(10, 6))
@@ -145,7 +161,7 @@ ax.invert_yaxis()
 plt.subplots_adjust(left=0.45, right=0.95, top=0.9, bottom=0.1)
 save_plot(ax, "user_agents.png")
 
-# 8. Hourly activity
+# Hourly activity
 fig, ax = plt.subplots(figsize=(7, 4))
 hourly = df.groupby("hour").size()
 ax.bar(hourly.index, hourly.values, color=COLOR)
@@ -154,7 +170,7 @@ ax.set_xlabel("Hour (UTC)")
 ax.set_ylabel("Requests")
 save_plot(ax, "hourly.png")
 
-# 9. GeoIP – Top Attacker Countries
+# GeoIP – Top Attacker Countries
 if GEOIP_ENABLED:
     reader = Reader(GEO_DB_PATH)
     countries = []
