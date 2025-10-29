@@ -1,0 +1,3 @@
+venv/
+cowrie_analysis/logs/
+cowrie_parsed_full.csv

