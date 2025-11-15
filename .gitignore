@@ -1,9 +1,15 @@
 venv/
+
+#cowrie
 cowrie_analysis/logs/
 cowrie_analysis/GeoLite2-Country.mmdb
 cowrie_parsed_full.csv
 
-tanner_analysis/logs/
+#santrypeer
+santrypeer_analysis/logs/
+santrypeer_analysis/GeoLite2-Country.mmdb
 
-# geolite DB
+#tanner
+tanner_analysis/logs/
 tanner_analysis/GeoLite2-City.mmdb
+
